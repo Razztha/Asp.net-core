@@ -1,5 +1,6 @@
 using EmployeeManager.Models;
 using EmployeeManager.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
@@ -9,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace EmployeeManager.Controllers
@@ -23,6 +25,8 @@ namespace EmployeeManager.Controllers
             _employeeRepository = employeeRepository;
             this.webHostEnvironment = webHostEnvironment;
         }
+
+        [AllowAnonymous]
         public ViewResult Index()
         {
             var model = _employeeRepository.GetAllEmployees();
@@ -30,11 +34,20 @@ namespace EmployeeManager.Controllers
             return View(model);
         }
 
+        [AllowAnonymous]
         public ViewResult Details(int? id)
         {
+            var employee = _employeeRepository.GetEmployee(id ?? 1);
+
+            if (employee == null)
+            {
+                Response.StatusCode = 404;
+                return View("EmployeeNotFound", id);
+            }
+
             HomeDetailsViewModel EmployeeViewModel = new HomeDetailsViewModel()
             {
-                Employee = _employeeRepository.GetEmployee(id??1),
+                Employee = employee,
                 PageTitle = "Employee Manager"
             };
             
@@ -121,7 +134,7 @@ namespace EmployeeManager.Controllers
                 };
 
                 _employeeRepository.Edit(employee);
-                return RedirectToAction("details", new { id = employee.Id });
+                return RedirectToAction("index");
             }
 
             return View(editEmployee);
