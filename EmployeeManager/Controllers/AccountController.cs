@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
+using EmployeeManager.Models;
 using EmployeeManager.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -12,10 +14,10 @@ namespace EmployeeManager.Controllers
 {
     public class AccountController : Controller
     {
-        private UserManager<IdentityUser> userManager;
-        private SignInManager<IdentityUser> signInManger;
+        private UserManager<ApplicationUser> userManager;
+        private SignInManager<ApplicationUser> signInManger;
 
-        public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
         {
             this.userManager = userManager;
             this.signInManger = signInManager;
@@ -37,7 +39,7 @@ namespace EmployeeManager.Controllers
                 var result = await signInManger.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
                 if (result.Succeeded)
                 {
-                    if (string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                    if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                     {
                         return Redirect(returnUrl);
                     }
@@ -66,10 +68,11 @@ namespace EmployeeManager.Controllers
             if (ModelState.IsValid)
             {
                 // Copy data from registerViewModel to identiy user
-                var user = new IdentityUser()
+                var user = new ApplicationUser()
                 {
                     UserName = model.Email,
-                    Email = model.Email
+                    Email = model.Email,
+                    City = model.City
                 };
 
                 var result = await userManager.CreateAsync(user, model.Password);
@@ -94,6 +97,22 @@ namespace EmployeeManager.Controllers
         {
             await signInManger.SignOutAsync();
             return RedirectToAction("index", "home");
+        }
+
+        [AcceptVerbs("Get", "Post")]
+        [AllowAnonymous]
+        public async Task<IActionResult> IsEmailInUse(string email)
+        {
+            var user = await userManager.FindByEmailAsync(email);
+
+            if (user == null)
+            {
+                return Json(true);
+            }
+            else
+            {
+                return Json($"Email {email} is already use");
+            }
         }
     }
 }
