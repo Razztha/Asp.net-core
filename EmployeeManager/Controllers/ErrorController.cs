@@ -23,15 +23,15 @@ namespace EmployeeManager.Controllers
         public IActionResult Error()
         {
             // Retrieve the exception Details
-            var exceptionHandlerPathFeature =
-                    HttpContext.Features.Get<IExceptionHandlerPathFeature>();
+            //var exceptionHandlerPathFeature =
+            //        HttpContext.Features.Get<IExceptionHandlerPathFeature>();
 
-            ViewBag.ExceptionPath = exceptionHandlerPathFeature.Path;
-            ViewBag.ExceptionMessage = exceptionHandlerPathFeature.Error.Message;
-            ViewBag.StackTrace = exceptionHandlerPathFeature.Error.StackTrace;
+            //ViewBag.ExceptionPath = exceptionHandlerPathFeature.Path;
+            //ViewBag.ExceptionMessage = exceptionHandlerPathFeature.Error.Message;
+            //ViewBag.StackTrace = exceptionHandlerPathFeature.Error.StackTrace;
 
-            logger.LogError($"The path {exceptionHandlerPathFeature.Path} " +
-            $"threw an exception {exceptionHandlerPathFeature.Error}");
+            //logger.LogError($"The path {exceptionHandlerPathFeature.Path} " +
+            //$"threw an exception {exceptionHandlerPathFeature.Error}");
 
             return View("Error");
         }

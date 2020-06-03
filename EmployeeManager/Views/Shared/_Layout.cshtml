@@ -1,6 +1,7 @@
 @using Microsoft.AspNetCore.Identity;
 @inject SignInManager<ApplicationUser> signInManager;
 
+
 <!DOCTYPE html>
 <html
 <head>
@@ -29,7 +30,7 @@
     <body>
         <div class="container">
             <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
-                <a class="navabar-brand" asp-controller="home" asp-action="index">       
+                <a class="navabar-brand" asp-controller="home" asp-action="index">
                     <img src="~/images/employees.png" height="30" width="30"/>
                 </a>
                 <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#collapsibleNavbar">
@@ -43,6 +44,16 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="home" asp-action="create">Create</a>
                         </li>
+                        @if (signInManager.IsSignedIn(User) && User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" id="navbardrop" data-toggle="dropdown" href="">Manage</a>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" asp-controller="admin" asp-action="ListUsers">Users</a>
+                                    <a class="dropdown-item" asp-controller="admin" asp-action="ListRoles">Roles</a>
+                                </div>
+                            </li>
+                        }
                     </ul>
                     <ul class="navbar-nav ml-auto">
                         @if (signInManager.IsSignedIn(User))
